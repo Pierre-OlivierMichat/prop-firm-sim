@@ -29,6 +29,8 @@ def main() -> int:
     ap.add_argument("--attempt-cap", type=int, default=1)
     ap.add_argument("--seed", default="42")
     ap.add_argument("--horizons", default="3,4,5,10,20,40")
+    ap.add_argument("--allow-projection-only", action="store_true",
+                    help="Explicitly allow approximate Lucid bootstrap; NEVER certify it")
     ap.add_argument("--funded-horizon", type=int, default=90)
     ap.add_argument("--risk", default="0.5%")
     ap.add_argument("--risk-mode", choices=["fixed-amount", "percent-of-balance", "percent-of-initial"],
@@ -59,6 +61,8 @@ def main() -> int:
         spec = json.load(f)
     if not isinstance(spec, dict) or not all(k in spec for k in ("steps", "funded", "fees", "maxLoss")):
         ap.error("Full versioned ChallengeSpec required; no guessed missing rules")
+    if str(spec.get("challengeId", "")).startswith("lucid-") and not a.allow_projection_only:
+        ap.error("Lucid specs are NOT certified in the LuxAlgo R bootstrap. For mark-aware admitted data use native_research_horizons.py; override ONLY for explicit approximate research with --allow-projection-only")
     cmd = ["node", str(a.node_cli), "simulate", "--spec", str(a.spec),
            "--trade-log", str(a.trades), "--risk", a.risk,
            "--risk-mode", a.risk_mode, "--paths", str(a.paths),

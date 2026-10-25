@@ -98,3 +98,61 @@ approved or received money.
 
 No market data was included in this public fork, and the generated
 synthetic sample is not a real Lucid performance estimate.
+
+## Mark-aware native research backend: admitted historical NQ/ES
+
+The older run_campaign.py is an R-multiple-only LuxAlgo compatibility model;
+it now **refuses projected Lucid accounts by default**, since those outputs
+cannot certify short-horizon payout eligibility. The explicit
+--allow-projection-only flag opts into that approximate, exploratory backend.
+
+To estimate P(eval pass) and first **modeled** payout REQUEST using exact
+ordered intratrade marks, a soft daily loss lockout, trailing drawdown,
+date-aware session counts, funded consistency, source-attested trade fills,
+and the existing source-bound ARC 56-variant catalogue, use
+native_research_horizons.py. The command imports the ARC-native binary via
+hash-verified research_ops.engine_truth.native_bridge; it does not copy
+proprietary market streams into this fork.
+
+Run from this fork (replace ARC_ROOT, and do not edit its authorities):
+
+    python integrations/arc_python/native_research_horizons.py --arc-repo ARC_ROOT --strategy NQ_PRECISION --programme LucidDaily --size-k 25 --ids lucid-daily-25k-dll-off-evaldd-eod-evalcons-50-20261023-v1 --horizons 3,4,5,10,20,40 --paths 1000 --seed 20261025 --execution 1 --side-fee-cents 189 --sizing ONE_MINI_FIXED --payout MINIMUM --output integrations/arc_python/local_results/daily25_example.json
+
+NQ_PRECISION and ES_PRECISION_PORT are currently the only source-admitted
+historical strategies, per ARC's pinned registry. Their market evidence is
+EXPOSED retrospective, not independent OOS. This tool refuses unregistered
+sources. It preserves the native outcome accounting and uses fresh native
+simulations for each chosen horizon. Horizon units are **OPEN TRADING
+SESSIONS**. Requested source market marks are verified and processed entirely
+inside the ARC native engine; the fork receipt reports hash fingerprints,
+counts, Wilson Monte Carlo 95% intervals and limitations, but not trade marks.
+Different horizon simulations have independently seeded Monte Carlo streams:
+finite-sample estimated event probabilities need not be perfectly monotone.
+
+Private historical performance receipts are retained only under ignored
+local_results/. Never commit strategy outcomes or proprietary source streams
+into this public repository. Running this adapter is not a strategy
+optimization, firm certification or evidence of cash receipts.
+
+Remaining critical compliance gaps:
+- LucidDaily USD high-impact news exclusion (flat 1m before/after),
+  plus current account agreement and any forbidden trading practices.
+- Evaluation-funded upgrade within 5–30m: ARC uses next-session proxy;
+  it may undercount same-day funded time-to-request.
+- Payout conditions can be met during a session for DLL-ON; ARC currently
+  checks only the modeled request day close, possibly conservative.
+- Pro 25K DLL-ON documentation conflict; native research adapter refuses
+  the affected account until checkout/support evidence resolves it.
+- Full firm rule version-to-purchase-date, order caps, Live transition, fees,
+  slippage sensitivity and independent statistical validity remain unresolved.
+- Monte Carlo seed variability is NOT model uncertainty or source-history CI.
+- Minimum payout request is not approved or received cash.
+
+A fully compliant first request cannot be certified until those restrictions
+are source-verified and encoded, a mark-aware strategy has validated fills,
+and model parity/independent holdout or prospective evidence gates are met.
+Do NOT claim to have fixed the missing information by adding defaults.
+
+Unit smoke tests (zero real market data):
+
+    python -m unittest discover -s integrations/arc_python -p test_*.py -v
