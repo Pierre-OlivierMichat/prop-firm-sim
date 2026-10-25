@@ -1,0 +1,48 @@
+{
+  "challengeId": "synthetic-not-lucid",
+  "name": "SYNTHETIC DEMO ONLY - not any real firm",
+  "productType": "futures",
+  "accountSize": 25000,
+  "currency": "USD",
+  "steps": [
+    {
+      "profitTargetAmount": 300,
+      "minTradingDays": 0,
+      "consistency": {
+        "maxBestDayProfitPct": 50
+      }
+    }
+  ],
+  "dailyLoss": {
+    "amount": 1000,
+    "evaluation": "intraday",
+    "basis": "prior-day-balance",
+    "limitBasis": "initial-balance",
+    "includesOpenPnl": true
+  },
+  "maxLoss": {
+    "mode": "static-initial",
+    "amount": 1500
+  },
+  "fees": {
+    "price": 60,
+    "billing": "one-time",
+    "resetFee": 60,
+    "activationFee": 25,
+    "refundableOnPass": false
+  },
+  "funded": {
+    "profitSplitPct": 80,
+    "payoutFrequency": "on-demand",
+    "firstPayoutMinDays": 0,
+    "payoutRules": {
+      "minWinningDays": 2,
+      "winningDayMinProfit": 100,
+      "bufferAmount": 100,
+      "consistencyMaxBestDayPct": 50
+    }
+  },
+  "flagsNotSimulated": [
+    "synthetic-example-no-source-verification"
+  ]
+}

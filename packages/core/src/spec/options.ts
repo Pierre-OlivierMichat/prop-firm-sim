@@ -47,6 +47,8 @@ export const SimOptionsSchema = z
       .boolean()
       .default(true)
       .describe("Include histogram arrays in the result (disable for compact transport)."),
+    // ARC extension: cumulative campaign outcomes at fixed elapsed simulated days.
+    campaignHorizons: z.array(z.number().int().min(1).max(2000)).min(1).max(30).optional(),
     tracePaths: z
       .number()
       .int()

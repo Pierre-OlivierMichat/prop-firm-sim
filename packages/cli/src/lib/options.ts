@@ -7,6 +7,7 @@ export interface SimFlags {
   seed?: string;
   attemptCap?: string;
   fundedHorizon?: string;
+  campaignHorizons?: string;
   /** commander's --no-funded: true by default, false when the flag is passed. */
   funded?: boolean;
 }
@@ -37,5 +38,12 @@ export function buildSimOptionsFromFlags(flags: SimFlags): SimOptionsInput {
         }
       : {}),
     ...(flags.funded === false ? { simulateFunded: false } : {}),
+    ...(flags.campaignHorizons !== undefined
+      ? {
+          campaignHorizons: flags.campaignHorizons.split(",").map((value) =>
+            parseNumberFlag("--campaign-horizons", value.trim(), { min: 1, max: 2000, integer: true }),
+          ),
+        }
+      : {}),
   };
 }

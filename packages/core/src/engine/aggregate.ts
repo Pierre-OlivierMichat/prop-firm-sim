@@ -17,6 +17,8 @@ export interface PathArrays {
   funded: Uint8Array;
   attempts: Float64Array;
   tradingDaysToFunded: Float64Array;
+  elapsedDaysToFunded: Float64Array;
+  elapsedDaysToFirstRequest: Float64Array;
   cost: Float64Array;
   payoutTotal: Float64Array;
   payoutEvents: Float64Array;
@@ -153,6 +155,18 @@ export function buildAssumptionFlags(
     );
   }
 
+  if (options.campaignHorizons !== undefined) {
+    engine(
+      "arc-campaign-request-proxy",
+      "A first eligible modeled withdrawal is treated as a payout-request proxy, not an approved request or bank cash.",
+    );
+    engine(
+      "arc-campaign-time-model",
+      "Campaign horizons use simulated elapsed sessions, not wall-clock days. Daily trade counts are fixed/Poisson, " +
+        "not the original historical session-by-session stream; no-trade calendar patterns and intra-trade excursions are not replayed.",
+    );
+  }
+
   if (profile.kind === "bootstrap") {
     engine(
       "bootstrap-resampling",
@@ -236,6 +250,39 @@ export function aggregate(
     };
   }
 
+  // Cumulative joint probabilities over entire campaign, including failed retries.
+  // Denominator is always ALL Monte Carlo paths, not merely paths reaching funded.
+  const campaign = options.campaignHorizons === undefined
+    ? undefined
+    : {
+        clock: "elapsed-simulated-days-from-first-evaluation" as const,
+        semantics: "first-modelled-withdrawal-is-request-eligibility-proxy" as const,
+        horizons: [...new Set(options.campaignHorizons)].sort((a, b) => a - b).map((days) => {
+          let evalPassedPaths = 0;
+          let modeledFirstRequestPaths = 0;
+          for (let p = 0; p < paths.funded.length; p++) {
+            if (Number.isFinite(paths.elapsedDaysToFunded[p]!) && paths.elapsedDaysToFunded[p]! <= days) {
+              evalPassedPaths++;
+            }
+            if (
+              Number.isFinite(paths.elapsedDaysToFirstRequest[p]!) &&
+              paths.elapsedDaysToFirstRequest[p]! <= days
+            ) {
+              modeledFirstRequestPaths++;
+            }
+          }
+          return {
+            days,
+            evalPassedPaths,
+            pPassEval: evalPassedPaths / options.paths,
+            pPassEvalCi: wilson95(evalPassedPaths, options.paths),
+            modeledFirstRequestPaths,
+            pFirstRequest: modeledFirstRequestPaths / options.paths,
+            pFirstRequestCi: wilson95(modeledFirstRequestPaths, options.paths),
+          };
+        }),
+      };
+
   const evMean = netAgg.summary.mean;
 
   return {
@@ -264,6 +311,7 @@ export function aggregate(
       daysToFunded: fundedCount > 0 ? summarizeSorted(daysToFundedSorted) : null,
     },
     funded,
+    ...(campaign === undefined ? {} : { campaign }),
     ev: {
       evTotal: evMean,
       evStandardError: standardError(paths.net, evMean),

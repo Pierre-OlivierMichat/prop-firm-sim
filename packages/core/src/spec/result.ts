@@ -159,6 +159,24 @@ export interface Trace {
   funded: TracePath[];
 }
 
+export interface CampaignHorizonStat {
+  /** Elapsed simulated session days since the first evaluation attempt (including retries). */
+  days: number;
+  evalPassedPaths: number;
+  pPassEval: number;
+  pPassEvalCi: WilsonCi;
+  modeledFirstRequestPaths: number;
+  /** Probability of a first modeled eligible withdrawal by this horizon, not bank receipt. */
+  pFirstRequest: number;
+  pFirstRequestCi: WilsonCi;
+}
+
+export interface CampaignStats {
+  clock: "elapsed-simulated-days-from-first-evaluation";
+  semantics: "first-modelled-withdrawal-is-request-eligibility-proxy";
+  horizons: CampaignHorizonStat[];
+}
+
 export interface SimResult {
   schemaVersion: 1;
   engineVersion: string;
@@ -167,6 +185,8 @@ export interface SimResult {
   /** null when options.simulateFunded is false. */
   funded: FundedStats | null;
   ev: EvStats;
+  /** Present only if campaignHorizons was supplied. */
+  campaign?: CampaignStats;
   drawdown: DrawdownStats;
   /** Present when options.tracePaths > 0. Pure observation; never changes the numbers. */
   trace?: Trace;

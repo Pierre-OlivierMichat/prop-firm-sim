@@ -26,6 +26,16 @@ export function simulate(
   const profile = TraderProfileSchema.parse(profileInput);
   const options = SimOptionsSchema.parse(optionsInput);
 
+  // To score a campaign at T, funded sampling must include at least T days:
+  // a late evaluation pass might otherwise be censored before its first request.
+  if (options.campaignHorizons !== undefined) {
+    if (!options.simulateFunded) {
+      throw new Error("campaignHorizons requires simulateFunded=true");
+    }
+    if (Math.max(...options.campaignHorizons) > options.fundedHorizonDays) {
+      throw new Error("fundedHorizonDays must cover the largest campaign horizon");
+    }
+  }
   const steps = resolveSteps(spec);
   const source = makeSource(profile);
   const masterSeed = normalizeSeed(options.seed);
@@ -35,6 +45,8 @@ export function simulate(
     funded: new Uint8Array(n),
     attempts: new Float64Array(n),
     tradingDaysToFunded: new Float64Array(n),
+    elapsedDaysToFunded: new Float64Array(n),
+    elapsedDaysToFirstRequest: new Float64Array(n),
     cost: new Float64Array(n),
     payoutTotal: new Float64Array(n),
     payoutEvents: new Float64Array(n),
@@ -80,6 +92,8 @@ export function simulate(
     paths.funded[p] = record.funded ? 1 : 0;
     paths.attempts[p] = record.attempts;
     paths.tradingDaysToFunded[p] = record.tradingDaysToFunded;
+    paths.elapsedDaysToFunded[p] = record.elapsedDaysToFunded;
+    paths.elapsedDaysToFirstRequest[p] = record.elapsedDaysToFirstRequest;
     paths.cost[p] = record.cost;
     paths.payoutTotal[p] = record.payoutTotal;
     paths.payoutEvents[p] = record.payoutEvents;

@@ -54,6 +54,10 @@ export interface JourneyRecord {
   attempts: number;
   /** Trading days spent evaluating until funded; NaN when never funded. */
   tradingDaysToFunded: number;
+  /** Elapsed simulated sessions across all evaluation attempts, including no-trade days. */
+  elapsedDaysToFunded: number;
+  /** Evaluation elapsed days + first modeled funded withdrawal day; NaN if none. */
+  elapsedDaysToFirstRequest: number;
   /** Total fees: prices + resets + activation + monthly billing − refunds. */
   cost: number;
   payoutTotal: number;
@@ -182,6 +186,9 @@ export function simulateJourney(
     funded,
     attempts,
     tradingDaysToFunded: funded ? evalTradingDays : Number.NaN,
+    elapsedDaysToFunded: funded ? evalDays : Number.NaN,
+    elapsedDaysToFirstRequest:
+      funded && Number.isFinite(firstPayoutDay) ? evalDays + firstPayoutDay : Number.NaN,
     cost,
     payoutTotal,
     payoutEvents,

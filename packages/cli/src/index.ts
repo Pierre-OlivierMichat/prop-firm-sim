@@ -91,6 +91,7 @@ function addSimOptions(cmd: Command): Command {
     .option("--seed <value>", "RNG seed, number or string (default: 42); same inputs + seed = same result")
     .option("--attempt-cap <n>", "max challenge attempts per path (default: 25)")
     .option("--funded-horizon <days>", "funded-stage horizon in trading days (default: 90)")
+    .option("--campaign-horizons <days>", "ARC extension: comma-separated elapsed days, e.g. 3,4,5,10,20,40")
     .option("--no-funded", "skip the funded-stage simulation (EV then counts fees minus refunds only)");
 }
 
