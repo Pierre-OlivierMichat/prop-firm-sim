@@ -57,6 +57,8 @@ export function simulateFunded(
   const maxPayoutFraction = pr?.maxPayoutPctOfProfit !== undefined ? pr.maxPayoutPctOfProfit / 100 : null;
   const maxPayoutAmount = pr?.maxPayoutAmount ?? null;
   const bufferAmount = pr?.bufferAmount ?? 0;
+  const minPayoutAmount = pr?.minPayoutAmount ?? 0;
+  const minCycleProfitAmount = pr?.minCycleProfitAmount ?? 0;
   const consistencyFraction =
     pr?.consistencyMaxBestDayPct !== undefined ? pr.consistencyMaxBestDayPct / 100 : null;
 
@@ -103,14 +105,15 @@ export function simulateFunded(
         consistencyFraction === null ||
         (windowProfit > 0 && bestDayInWindow <= consistencyFraction * windowProfit + epsilon);
 
-      if (profit > bufferAmount + epsilon && winningDays >= minWinningDays && consistencyOk) {
+      if (profit > bufferAmount + epsilon && winningDays >= minWinningDays &&
+          windowProfit + epsilon >= minCycleProfitAmount && consistencyOk) {
         let withdrawal = profit - bufferAmount;
         if (maxPayoutFraction !== null) withdrawal = Math.min(withdrawal, maxPayoutFraction * profit);
         if (maxPayoutAmount !== null) withdrawal = Math.min(withdrawal, maxPayoutAmount);
         // A withdrawal may never take the balance to or below the loss floor.
         withdrawal = Math.min(withdrawal, balance - state.currentMaxFloor - epsilon);
 
-        if (withdrawal > epsilon) {
+        if (withdrawal > epsilon && withdrawal + epsilon >= minPayoutAmount) {
           payoutTotal += withdrawal * splitFraction;
           payoutEvents++;
           firstPayoutDay ??= day;

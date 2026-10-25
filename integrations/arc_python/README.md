@@ -1,6 +1,6 @@
 # ARC / LuxAlgo Python bridge (research prototype)
 
-This is a local development branch cloned from LuxAlgo dev, commit 05e443250f1294c03fe65120727666feeb353e32. The GitHub-hosted fork has not been created.
+This branch was cloned from LuxAlgo dev, upstream commit 05e443250f1294c03fe65120727666feeb353e32. Public GitHub fork: https://github.com/Pierre-OlivierMichat/prop-firm-sim/tree/arc/first-payout-python-bridge. The upstream dev branch remains unmodified.
 
 After corepack pnpm install and corepack pnpm build:
 
@@ -52,3 +52,49 @@ resolving vendor rights and ARC evidence eligibility. Official Sierra SCID forma
 documentation has been removed; decoder layout was cross-checked against the
 publicly documented legacy 56/40-byte record structure, not every historical
 file/version variant. Live/protected data and broker permissions remain gated.
+
+## LucidDaily / LucidPro / LucidFlex account catalogue
+
+The generator reads only the source-bound 2026-10-23 ARC Python account catalogue;
+it does not inspect historical market files. It reproduces the 56 unique ARC
+variant IDs/hashes and exports the requested size subset into **versioned
+LuxAlgo ChallengeSpec JSON** plus a SHA256 source/translation manifest.
+
+Example, from the fork root:
+
+    python integrations/arc_python/export_lucid_specs.py --arc-repo PATH/TO/vp_edge_backtest --output-dir integrations/arc_python/lucid_specs_20261023_v1 --sizes 25,50 --fee 25=60 --fee 50=90
+
+The supplied evaluation fees of 60/90 USD are **explicit hypothetical research
+inputs**, not verified Lucid checkout prices. By default the export includes
+16 LucidDaily, 4 LucidPro and 8 LucidFlex 25K/50K variants.
+
+Run one simulated, provisional account using an admitted strategy CSV:
+
+    python integrations/arc_python/run_campaign.py --trades PATH/strategy.csv --spec integrations/arc_python/lucid_specs_20261023_v1/lucid-daily-25k-dll-off-evaldd-eod-evalcons-50-20261023-v1.json --paths 2000 --attempt-cap 1 --horizons 3,4,5,10,20,40 --risk 100 --risk-mode fixed-amount --output PATH/result.json
+
+Every generated account has explicit flagsNotSimulated and a manifest
+status of PROJECTION_ONLY_NOT_RULE_PARITY_CERTIFIED. The firm source
+linkage is in the manifest, not in the ChallengeSpec sources property,
+which requires a human-verified date. The bridge never claims such
+human verification. All 28 inputs pass the LuxAlgo Zod challenge schema.
+
+### Current rule coverage / blocking gaps
+
+Modeled: evaluation target, one-step evaluation, min trading days,
+best-day evaluation consistency (Daily/Flex), evaluation/funded drawdown
+types, funded payout buffer, minimum first-request amount (USD 500),
+first cycle profit threshold, funded Pro 40% consistency, Flex five
+qualifying days and minimum winning-day amount, first payout cap,
+first-request share, and provisional fees.
+
+NOT modeled with exact parity: intratrade equity marks, soft DLL trade
+halts and scaling, DLL-triggered profit caps, LucidDaily's news
+blackout and live-transfer threshold, Flex dynamic mini scaling,
+full calendar-accurate funding activation, actual payout approval
+and bank-cash receipt. Strict full-account certification remains
+blocked until these are addressed in the event engine and tested
+against ARC native rules. Never treat a modeled payout event as
+approved or received money.
+
+No market data was included in this public fork, and the generated
+synthetic sample is not a real Lucid performance estimate.

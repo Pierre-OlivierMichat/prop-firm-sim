@@ -1,0 +1,72 @@
+{
+  "accountSize": 25000,
+  "challengeId": "lucid-daily-25k-dll-on-evaldd-eod-evalcons-40-20261023-v1",
+  "constraints": {
+    "maxContractSize": 2
+  },
+  "currency": "USD",
+  "dailyLoss": null,
+  "fees": {
+    "activationFee": 0.0,
+    "billing": "one-time",
+    "price": 60.0,
+    "refundableOnPass": false,
+    "resetFee": null
+  },
+  "flagsNotSimulated": [
+    "EVALUATION_INTRADAY_ACTIVATION_NOT_MODELED: assumes next session",
+    "EVAL_ACTIVATION_5_TO_30_MIN: native EOD next-session proxy",
+    "FEES: purchase checkout and transfer/processing fees unverified",
+    "FUNDED_HIGH_IMPACT_USD_NEWS_1MIN_BLACKOUT: not enforced by native",
+    "INACTIVITY_AND_ORDERS: verify current contract before certification",
+    "INTRADAY_PAYOUT: native requests at session close, not inside session",
+    "MAX_DAILY_PROFIT_TO_LIVE: not enforced by native",
+    "NATIVE_FIRST_REQUEST_ONLY: later payouts and Live not simulated",
+    "NEWS_AND_HEDGING: upstream event permission filters required",
+    "PAYOUT_APPROVAL_IS_NOT_REQUEST_OR_BANK_RECEIPT",
+    "PAYOUT_APPROVAL_RECEIPT: no observed approval or bank receipt",
+    "PAYOUT_MINIMUM_ENFORCED_FIRST_REQUEST_ONLY",
+    "PURCHASE_FEE_HYPOTHETICAL_NOT_CHECKOUT_VERIFIED",
+    "RESET_FEE_UNKNOWN: restrict interpretation to one attempt",
+    "SIMULATOR_BOOTSTRAP_OMITS_DAILY_TIMES_AND_INTRATRADE_MARKS",
+    "SOFT_DLL_NOT_ENFORCED: LuxAlgo models breach/fail, not soft trade halt",
+    "TRADING_CAPS_NOT_ENFORCED: requires causal Python strategy sizing",
+    "TRADING_DAY_CALENDAR: source adapter must bind official ET session dates"
+  ],
+  "funded": {
+    "dailyLoss": null,
+    "firstPayoutMinDays": 0,
+    "maxLoss": {
+      "amount": 1000.0,
+      "lockOffsetAmount": 100.0,
+      "locksAtInitial": true,
+      "mode": "trailing-locks-at-initial"
+    },
+    "payoutFrequency": "on-demand",
+    "payoutRules": {
+      "bufferAmount": 1100.0,
+      "minCycleProfitAmount": 0.01,
+      "minPayoutAmount": 500.0,
+      "minWinningDays": 0,
+      "winningDayMinProfit": 0.0
+    },
+    "profitSplitPct": 90.0
+  },
+  "maxLoss": {
+    "amount": 1000.0,
+    "lockOffsetAmount": 100.0,
+    "locksAtInitial": true,
+    "mode": "trailing-realized-eod"
+  },
+  "name": "LucidDaily 25K | DLL on | evalDD EOD | consistency 40",
+  "productType": "futures",
+  "steps": [
+    {
+      "consistency": {
+        "maxBestDayProfitPct": 40.0
+      },
+      "minTradingDays": 1,
+      "profitTargetAmount": 1250.0
+    }
+  ]
+}

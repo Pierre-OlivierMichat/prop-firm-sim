@@ -276,6 +276,10 @@ export const FundedSpecSchema = z
             "Profit buffer that must remain in the account; only profit above it is withdrawable " +
               "(common on futures funded accounts).",
           ),
+        minPayoutAmount: z.number().min(0).default(0)
+          .describe("Minimum cash withdrawal request, pre-split, before a payout may occur."),
+        minCycleProfitAmount: z.number().min(0).default(0)
+          .describe("Minimum funded account profit since previous approved payout."),
         consistencyMaxBestDayPct: z
           .number()
           .positive()
